@@ -1,16 +1,10 @@
-/*!
- * Created by Manh Tuan (JUNO_OKYO)
- * Demo for my video on TikTok: https://www.tiktok.com/@juno_okyo/video/7284660854539177221
- * Follow me for more videos.
- *
- * Please edit webhookUrl and token before run this script!!!
- */
 import TelegramBot from 'node-telegram-bot-api';
 import fetch from 'node-fetch';
 import 'dotenv/config';
 
-const bot = new TelegramBot(process.env.BOT_TOKEN, { polling: true });
-console.log(bot);
+const token = process.env.BOT_TOKEN;
+const bot = new TelegramBot(token, { polling: true });
+const webhookUrl = process.env.WEBHOOK_URL;
 
 bot.onText(/\/add (.+)/, (msg, match) => {
     const chatId = msg.chat.id;
@@ -29,10 +23,16 @@ bot.onText(/\/add (.+)/, (msg, match) => {
         bot.sendMessage(chatId, 'Price phải là số.');
         return;
     }
-    const url = new URL(process.env.WEBHOOK_URL);
+
+// Get the current date and time in the time zone of Vietnam (Indochina Time - ICT)
+var date = new Date().toLocaleString('en-US', { timeZone: 'Asia/Ho_Chi_Minh' });
+
+    const url = new URL(webhookUrl);
+    url.searchParams.append('Date', date);
     url.searchParams.append('Name', values[0]);
     url.searchParams.append('Price', values[1]);
     url.searchParams.append('Dog', msg.from.username);
+
 
     fetch(url)
         .then(res => res.json())
